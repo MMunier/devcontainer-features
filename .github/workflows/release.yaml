@@ -1,6 +1,7 @@
 name: release
 
-on:
+# Quoted: YAML parses a bare `on` as boolean true, and the workflow never fires.
+"on":
   push:
     branches: [main]
     # Only republish when a feature actually changes — not on README-only or

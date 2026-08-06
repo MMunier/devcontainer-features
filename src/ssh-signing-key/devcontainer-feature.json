@@ -1,0 +1,28 @@
+{
+  "id": "ssh-signing-key",
+  "version": "1.1.0",
+  "name": "SSH commit signing (hardware-backed key, e.g. Yubikey sk-ssh)",
+  "description": "Wires up git SSH commit signing for a hardware-backed key such as a Yubikey sk-ssh-ed25519 resident key. Reads the PUBLIC key (not secret) from a runtime env var — picked up automatically via an --env-file in runArgs, no shell-sourcing required — writes it into ~/.ssh, and points git config at it. Reasserts the git config on every attach, since VS Code re-copies ~/.gitconfig from the host on each connect and would otherwise clobber the path with a host-only one that doesn't exist in the container. Actual signing happens through your host's ssh-agent via VS Code's automatic agent-forwarding socket — you must `ssh-add` the private key on the HOST yourself (e.g. `ssh-add ~/.ssh/id_ed25519_sk`); this feature only wires the container side.",
+  "documentationURL": "https://github.com/MMunier/devcontainer-features/tree/main/src/ssh-signing-key",
+  "options": {
+    "pubkeyEnv": {
+      "type": "string",
+      "default": "SSH_SIGNING_PUBKEY",
+      "description": "Name of the environment variable holding the PUBLIC signing key, read at attach time. A public key is not a secret; it is read from the environment rather than baked in so the same image works for any user."
+    },
+    "keyFilename": {
+      "type": "string",
+      "default": "id_ed25519_sk.pub",
+      "description": "Filename written under ~/.ssh for the public key that git is pointed at."
+    },
+    "signAllCommits": {
+      "type": "boolean",
+      "default": true,
+      "description": "Set commit.gpgsign=true, so every commit is signed without passing -S. Turn off to wire up the key but sign only on demand."
+    }
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils"
+  ],
+  "postAttachCommand": "/usr/local/share/ssh-signing-key-attach.sh"
+}

@@ -1,0 +1,34 @@
+{
+  // The baseline agent container: Claude Code installed, logged in once, and staying
+  // logged in across rebuilds. Start here and add from the other examples as needed.
+  "name": "claude-code-dev",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    // Node MUST come before claude-code. That feature only installs Node when node+npm
+    // are absent, and its self-install path can fall through to a distro nodejs that
+    // ships WITHOUT npm — failing its own `command -v npm` check and exiting 1
+    // ("Node.js and npm are required but could not be installed"). Providing Node here
+    // means claude-code skips that path entirely.
+    "ghcr.io/devcontainers/features/node:2": { "version": "lts" },
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {},
+
+    // Keeps the login across stop/start AND rebuilds. Self-contained: it declares its
+    // own named volume and pre-seeds the mount target owned by the remote user at build
+    // time, so no `sudo chown` in postCreateCommand is needed.
+    "ghcr.io/mmunier/devcontainer-features/claude-code-persist-login:1": {}
+  },
+
+  // claude-code declares no dependency on the node feature, so pin the order rather
+  // than relying on the resolver to happen to get it right.
+  "overrideFeatureInstallOrder": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/node",
+    "ghcr.io/anthropics/devcontainer-features/claude-code"
+  ],
+
+  "postAttachCommand": "claude --version || echo 'claude not found — check the claude-code feature install log'",
+
+  "remoteUser": "vscode"
+}

@@ -1,0 +1,35 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      # Don't cancel the other features when one fails — the whole point of a
+      # matrix here is seeing every feature's result in one run.
+      fail-fast: false
+      matrix:
+        feature:
+          - claude-code-persist-login
+          - ssh-signing-key
+          - authorized-key
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run `devcontainer features test` for ${{ matrix.feature }}
+        uses: devcontainers/action@v1
+        with:
+          features: ${{ matrix.feature }}
+          # Runs every scenario in test/<feature>/scenarios.json.
+          #
+          # Docs are NOT auto-generated in this repo. The generator rewrites
+          # README.md wholesale from devcontainer-feature.json, which would delete
+          # the hand-written "How it works, and why" sections — the part that
+          # explains the non-obvious build-time/runtime constraints these features
+          # exist to work around. Option tables are maintained by hand instead.
+          generate-docs: false

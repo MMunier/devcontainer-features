@@ -1,0 +1,54 @@
+{
+  // For the PURE-CLI path: `devcontainer up` instead of VS Code's Reopen in Container.
+  //
+  // VS Code forwards the ssh-agent over its own connection automatically; the bare
+  // `devcontainer` CLI does NOT. So this config runs sshd inside the container and you
+  // `ssh -A` into it — YubiKey/ssh-sk agent forwarding then rides that SSH channel,
+  // which is also the reliable path across a VM boundary (e.g. Kata), unlike sharing an
+  // agent socket over virtiofs.
+  "name": "ssh-accessible",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    // See the claude-code-dev example for why Node must precede claude-code.
+    "ghcr.io/devcontainers/features/node:2": { "version": "lts" },
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {},
+    "ghcr.io/mmunier/devcontainer-features/claude-code-persist-login:1": {},
+
+    // sshd on port 2222 inside the container.
+    "ghcr.io/devcontainers/features/sshd:1": {},
+
+    // The official sshd feature has no way to inject an authorized key — it expects you
+    // to set a password by hand after the container is up. This fills that gap at build
+    // time, with correct 700/600 permissions. installsAfter sshd.
+    //
+    // REPLACE the placeholder with YOUR public key, e.g. from ~/.ssh/id_ed25519_sk.pub.
+    // A public key is not a secret, so committing your own is fine — the placeholder is
+    // here only so no personal key lands in this repo.
+    "ghcr.io/mmunier/devcontainer-features/authorized-key:1": {
+      "publicKey": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAExamplePublicKeyReplaceMe you@your-host"
+    }
+  },
+
+  "overrideFeatureInstallOrder": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/node",
+    "ghcr.io/anthropics/devcontainer-features/claude-code"
+  ],
+
+  // Publish sshd's port to the host so the CLI path reaches it at localhost:2222 without
+  // extra flags. VS Code auto-forwards ports anyway; declaring it helps the CLI path.
+  //
+  //     ssh -A -p 2222 vscode@localhost
+  //
+  "appPort": ["2222:2222"],
+
+  "postAttachCommand": "ssh-add -l || echo 'no keys via forwarded agent — check SSH_AUTH_SOCK / agent forwarding'",
+
+  "remoteEnv": {
+    "SSH_AUTH_SOCK": "${localEnv:SSH_AUTH_SOCK}"
+  },
+
+  "remoteUser": "vscode"
+}

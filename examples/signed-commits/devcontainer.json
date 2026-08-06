@@ -1,0 +1,40 @@
+{
+  // Claude Code plus hardware-backed git commit signing — commits made in the container
+  // are signed by the YubiKey on your HOST, whose private key never enters the container.
+  "name": "signed-commits",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    // See the claude-code-dev example for why Node must precede claude-code.
+    "ghcr.io/devcontainers/features/node:2": { "version": "lts" },
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {},
+    "ghcr.io/mmunier/devcontainer-features/claude-code-persist-login:1": {},
+
+    // Reads the PUBLIC key from $SSH_SIGNING_PUBKEY at ATTACH time — not build time —
+    // and points git at it. Attach time matters twice over: a feature option is fixed
+    // when the image is built (so an --env-file value could never reach it), and VS Code
+    // re-copies ~/.gitconfig from the host on every connect, which would otherwise
+    // clobber user.signingkey with a host path that does not exist in here.
+    "ghcr.io/mmunier/devcontainer-features/ssh-signing-key:1": {}
+  },
+
+  "overrideFeatureInstallOrder": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/node",
+    "ghcr.io/anthropics/devcontainer-features/claude-code"
+  ],
+
+  // Where SSH_SIGNING_PUBKEY comes from. Copy devcontainer.env.example next to this file
+  // to devcontainer.env (GITIGNORED) and fill it in. Unlike "${localEnv:...}", an
+  // --env-file needs nothing exported in the shell that launched VS Code.
+  "runArgs": ["--env-file", ".devcontainer/devcontainer.env"],
+
+  // Signing itself goes out through the HOST's ssh-agent, forwarded automatically by
+  // VS Code. You must load the key on the host yourself:  ssh-add ~/.ssh/id_ed25519_sk
+  "remoteEnv": {
+    "SSH_AUTH_SOCK": "${localEnv:SSH_AUTH_SOCK}"
+  },
+
+  "remoteUser": "vscode"
+}

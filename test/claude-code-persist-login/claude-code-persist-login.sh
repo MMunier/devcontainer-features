@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+#
+# Test for the claude-code-persist-login feature. Run by the devcontainers/action
+# test harness (`devcontainer features test`).
+#
+# The feature's whole job is build-time seeding: create the mount target owned by the
+# remote user so Docker's volume seeding gives a fresh volume the right ownership.
+# The harness does not attach the named volume, so what is asserted here is the
+# SEED — the directory and symlink as the image layer leaves them, which is exactly
+# what Docker copies into the empty volume.
+#
+set -e
+source dev-container-features-test-lib
+
+CLAUDE_DIR="/home/vscode/.claude"
+CLAUDE_JSON="/home/vscode/.claude.json"
+
+check "mount target exists"        test -d "$CLAUDE_DIR"
+check "target owned by vscode"     bash -c "[ \"\$(stat -c %U $CLAUDE_DIR)\" = vscode ]"
+check "target perms are 700"       bash -c "[ \"\$(stat -c %a $CLAUDE_DIR)\" = 700 ]"
+
+# ~/.claude.json lives in $HOME, OUTSIDE the mounted dir, so it must be relocated
+# into the volume and symlinked back — otherwise MCP servers and project history
+# reset on every rebuild even though the OAuth token survives.
+check "~/.claude.json is a symlink" test -L "$CLAUDE_JSON"
+check "symlink points into the volume" bash -c "
+  [ \"\$(readlink $CLAUDE_JSON)\" = $CLAUDE_DIR/.claude.json ]"
+check "symlink target exists"      test -f "$CLAUDE_DIR/.claude.json"
+check "symlink owned by vscode"    bash -c "[ \"\$(stat -c %U $CLAUDE_JSON)\" = vscode ]"
+
+# The seeded target must be writable BY THE REMOTE USER without sudo — that is the
+# entire point of seeding at build time instead of chowning in postCreate.
+check "remote user can write it"   bash -c "
+  su vscode -c 'touch $CLAUDE_DIR/.write-probe && rm $CLAUDE_DIR/.write-probe'"
+
+# Whatever the symlink resolves to must be writable too, since that is where Claude
+# Code actually writes its config.
+check "remote user can write .claude.json" bash -c "
+  su vscode -c 'printf {} > $CLAUDE_JSON && test -s $CLAUDE_DIR/.claude.json'"
+
+reportResults

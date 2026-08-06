@@ -1,0 +1,25 @@
+{
+  "authorized-key": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "authorized-key": {
+        "publicKey": "sk-ssh-ed25519@openssh.com AAAATESTKEY000 test@harness",
+        "targetUser": "vscode"
+      }
+    }
+  },
+  "multiple-keys": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "authorized-key": {
+        "publicKey": "ssh-ed25519 AAAAKEYONE first@harness\\nssh-ed25519 AAAAKEYTWO second@harness"
+      }
+    }
+  },
+  "no-key": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "authorized-key": {}
+    }
+  }
+}

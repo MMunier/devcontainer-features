@@ -1,0 +1,14 @@
+{
+  "id": "claude-code-persist-login",
+  "version": "1.0.0",
+  "name": "Persist Claude Code login",
+  "description": "Persists Claude Code's login (~/.claude, incl. the OAuth token in .credentials.json, AND ~/.claude.json which is symlinked into the volume since it lives outside ~/.claude) in a named Docker volume that outlives container stop/start and rebuilds. Pre-seeds the mount target owned by the remote user at build time so Docker's volume seeding gives the fresh volume correct ownership (no runtime chown / sudo needed).",
+  "documentationURL": "https://github.com/MMunier/devcontainer-features/tree/main/src/claude-code-persist-login",
+  "mounts": [
+    {
+      "source": "${devcontainerId}-claude-code-config",
+      "target": "/home/vscode/.claude",
+      "type": "volume"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+name: release
+
+on:
+  push:
+    branches: [main]
+    # Only republish when a feature actually changes — not on README-only or
+    # workflow commits. Publishing is idempotent per version, but a no-op run
+    # still churns package versions in the UI.
+    paths:
+      - 'src/**'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      # Required to push the OCI artifacts to ghcr.io.
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Publish features to ghcr.io
+        uses: devcontainers/action@v1
+        with:
+          publish-features: true
+          base-path-to-features: ./src
+          # Each feature is published as its own package, at the version in its
+          # devcontainer-feature.json. Bump that version to release — pushing the
+          # same version again is a no-op, so a forgotten bump ships nothing.
+          oci-registry: ghcr.io
+          generate-docs: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

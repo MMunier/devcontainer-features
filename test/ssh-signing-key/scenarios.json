@@ -1,0 +1,20 @@
+{
+  "defaults": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "remoteUser": "vscode",
+    "features": {
+      "ssh-signing-key": {}
+    }
+  },
+  "custom-options": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "remoteUser": "vscode",
+    "features": {
+      "ssh-signing-key": {
+        "pubkeyEnv": "MY_SIGNING_KEY",
+        "keyFilename": "yubikey.pub",
+        "signAllCommits": false
+      }
+    }
+  }
+}

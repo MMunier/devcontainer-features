@@ -1,0 +1,23 @@
+{
+  "id": "authorized-key",
+  "version": "1.0.0",
+  "name": "SSH authorized_keys injector",
+  "description": "Installs one or more SSH public keys into a user's ~/.ssh/authorized_keys with correct 700/600 permissions. Pairs with the sshd feature to enable key-based (incl. FIDO/sk-*) login and agent forwarding via `ssh -A`.",
+  "documentationURL": "https://github.com/MMunier/devcontainer-features/tree/main/src/authorized-key",
+  "options": {
+    "publicKey": {
+      "type": "string",
+      "default": "",
+      "description": "SSH public key line(s) to authorize. A public key is not a secret, so it is safe to hardcode. Use \\n to separate multiple keys."
+    },
+    "targetUser": {
+      "type": "string",
+      "default": "automatic",
+      "description": "User whose ~/.ssh/authorized_keys is written. 'automatic' resolves to _REMOTE_USER (the devcontainer's remote user, e.g. vscode)."
+    }
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/sshd"
+  ]
+}

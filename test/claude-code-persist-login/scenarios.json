@@ -1,0 +1,9 @@
+{
+  "claude-code-persist-login": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "remoteUser": "vscode",
+    "features": {
+      "claude-code-persist-login": {}
+    }
+  }
+}

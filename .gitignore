@@ -1,0 +1,10 @@
+# Env files hold real values — only the .example templates belong in git.
+devcontainer.env
+*.env
+!*.env.example
+
+# Secrets files for `devcontainer up --secrets-file`.
+secrets.json
+!secrets.json.example
+
+.DS_Store

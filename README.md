@@ -14,6 +14,8 @@ one it works around and why the obvious approach fails.
 | [`claude-code-persist-login`](src/claude-code-persist-login) | Keeps the Claude Code login across rebuilds, in a named volume, with no `postCreateCommand` chown. |
 | [`ssh-signing-key`](src/ssh-signing-key) | Git commit signing with a hardware-backed key (YubiKey `sk-ssh-*`), private half never entering the container. |
 | [`authorized-key`](src/authorized-key) | Injects SSH public keys into `authorized_keys` with correct perms. Fills the gap the official `sshd` feature leaves. |
+| [`forgejo-cli`](src/forgejo-cli) | Forgejo CLI (`fj`) for reading and filing issues, authenticated from a runtime token that never enters the image. |
+| [`github-cli-auth`](src/github-cli-auth) | Auth wiring for the official `github-cli` feature: runtime token, plus the `gh auth setup-git` that VS Code's gitconfig copy would otherwise drop. |
 
 ## Usage
 
@@ -36,6 +38,8 @@ Complete, working configurations are in [`examples/`](examples):
 | [`claude-code-dev`](examples/claude-code-dev) | The baseline: Claude Code that stays logged in. Start here. |
 | [`signed-commits`](examples/signed-commits) | Adds YubiKey-backed commit signing. |
 | [`ssh-accessible`](examples/ssh-accessible) | For the bare `devcontainer` CLI, where VS Code's automatic agent forwarding isn't available. |
+| [`forgejo-issues`](examples/forgejo-issues) | Adds the Forgejo CLI, for reading and filing issues from inside the container. |
+| [`github-issues`](examples/github-issues) | The same, for GitHub. |
 
 ## One thing that bites everyone
 

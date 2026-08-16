@@ -10,6 +10,10 @@ name: test
 jobs:
   test:
     runs-on: ubuntu-latest
+    # Read-only: the tests never publish. Stated explicitly so this stays true even
+    # if the repo default is later loosened.
+    permissions:
+      contents: read
     strategy:
       # Don't cancel the other features when one fails — the whole point of a
       # matrix here is seeing every feature's result in one run.
@@ -19,11 +23,14 @@ jobs:
           - claude-code-persist-login
           - ssh-signing-key
           - authorized-key
+          - forgejo-cli
+          - github-cli-auth
     steps:
-      - uses: actions/checkout@v4
+      # Pinned to commit SHAs, not mutable tags. See release.yaml for the reasoning.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Run `devcontainer features test` for ${{ matrix.feature }}
-        uses: devcontainers/action@v1
+        uses: devcontainers/action@1082abd5d2bf3a11abccba70eef98df068277772 # v1
         with:
           features: ${{ matrix.feature }}
           # Runs every scenario in test/<feature>/scenarios.json.

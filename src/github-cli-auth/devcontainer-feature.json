@@ -1,0 +1,32 @@
+{
+  "id": "github-cli-auth",
+  "version": "1.0.0",
+  "name": "GitHub CLI auth (token from a runtime env var)",
+  "description": "Authenticates the GitHub CLI (`gh`) from a token supplied at runtime — picked up automatically via an --env-file in runArgs, no shell-sourcing required — so issues and pull requests can be read and filed from inside the container. Installation of `gh` itself is left to the official github-cli feature, which this declares a dependency on; what is added here is the auth wiring. `gh` reads GH_TOKEN from the environment natively, so nothing is written to disk for the CLI itself; the attach script instead runs `gh auth setup-git`, which teaches git to push and clone over HTTPS with the same token. That part must be reasserted on every attach, since VS Code re-copies ~/.gitconfig from the host on each connect and would otherwise drop the credential helper. A missing token is a skip, not a failure.",
+  "documentationURL": "https://github.com/MMunier/devcontainer-features/tree/main/src/github-cli-auth",
+  "options": {
+    "tokenEnv": {
+      "type": "string",
+      "default": "GH_TOKEN",
+      "description": "Name of the environment variable holding the GitHub token. `gh` reads GH_TOKEN (then GITHUB_TOKEN) natively, so leaving this at the default means the CLI is authenticated with no further work. Setting it to any other name makes the attach script re-export that value as GH_TOKEN for interactive shells."
+    },
+    "host": {
+      "type": "string",
+      "default": "github.com",
+      "description": "GitHub host the token authenticates against, as a bare hostname. Set to a GitHub Enterprise hostname to target that instance; the token is then also exported as GH_ENTERPRISE_TOKEN, which is what gh requires for non-github.com hosts."
+    },
+    "setupGit": {
+      "type": "boolean",
+      "default": true,
+      "description": "Run `gh auth setup-git` on attach, so `git push`/`git clone` over HTTPS authenticate with the same token. Reasserted every attach because VS Code re-copies ~/.gitconfig from the host on each connect. Turn off if you push over SSH and want git left alone."
+    }
+  },
+  "dependsOn": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/git"
+  ],
+  "postAttachCommand": "/usr/local/share/github-cli-auth-attach.sh"
+}

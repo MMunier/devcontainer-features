@@ -1,0 +1,20 @@
+{
+  "defaults": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "ghcr.io/devcontainers/features/github-cli:1": {},
+      "github-cli-auth": {}
+    }
+  },
+  "enterprise-host": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "ghcr.io/devcontainers/features/github-cli:1": {},
+      "github-cli-auth": {
+        "tokenEnv": "GHE_PAT",
+        "host": "github.example.com",
+        "setupGit": false
+      }
+    }
+  }
+}

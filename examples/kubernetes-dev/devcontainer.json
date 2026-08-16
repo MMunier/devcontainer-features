@@ -11,13 +11,14 @@
     "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {},
     "ghcr.io/mmunier/devcontainer-features/claude-code-persist-login:1": {},
 
-    // Installing kubectl is the official feature's job; krew builds on top of it.
-    // helm/minikube are off here — turn them on if you want them.
-    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
-      "helm": "none",
-      "minikube": "none"
-    },
-
+    // kubectl is NOT listed here: krew declares it via dependsOn, which also defaults
+    // helm and minikube to "none" (krew needs neither, and minikube is a heavy install
+    // to inherit by accident). To get them, list the feature yourself with the options
+    // you want — an explicit entry overrides the dependency's defaults, and nothing is
+    // installed twice:
+    //
+    //   "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": { "helm": "latest" },
+    //
     // Plugins are baked into the IMAGE at build time, so container start is instant and
     // needs no network. krew normally installs per-user into ~/.krew, which a build
     // running as root would put in /root/.krew — invisible to the remote user; the

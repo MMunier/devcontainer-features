@@ -9,6 +9,14 @@
       "krew": {}
     }
   },
+  "dependency-only": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "krew": {
+        "plugins": "ctx"
+      }
+    }
+  },
   "with-plugins": {
     "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
     "features": {

@@ -12,17 +12,34 @@ kubectl krew install x # add more later, no sudo needed
 
 Installing `kubectl` itself is left to the official
 [`kubectl-helm-minikube`](https://github.com/devcontainers/features/tree/main/src/kubectl-helm-minikube)
-feature, declared here as a dependency.
+feature, declared here as a dependency — so you don't have to list it
+yourself.
 
 ## Usage
 
 ```jsonc
 {
   "features": {
-    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {},
     "ghcr.io/mmunier/devcontainer-features/krew:1": {
       "plugins": "ctx,ns,tree,neat"
     }
+  }
+}
+```
+
+That's the whole config: `kubectl` comes in through `dependsOn`, with `helm` and
+`minikube` defaulted to `none` — krew needs neither, and minikube in particular
+is a heavy install to inherit by accident.
+
+Those are **defaults, not decisions**. Listing the feature yourself overrides
+them, and nothing is installed twice:
+
+```jsonc
+{
+  "features": {
+    // Want helm too? Ask for it — this wins over the dependency's defaults.
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": { "helm": "latest" },
+    "ghcr.io/mmunier/devcontainer-features/krew:1": { "plugins": "ctx,ns" }
   }
 }
 ```

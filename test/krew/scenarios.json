@@ -1,0 +1,37 @@
+{
+  "defaults": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+        "helm": "none",
+        "minikube": "none"
+      },
+      "krew": {}
+    }
+  },
+  "with-plugins": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+        "helm": "none",
+        "minikube": "none"
+      },
+      "krew": {
+        "plugins": "ctx,ns"
+      }
+    }
+  },
+  "bad-plugin-name": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+        "helm": "none",
+        "minikube": "none"
+      },
+      "krew": {
+        "plugins": "ctx, definitely-not-a-real-plugin, ns",
+        "krewRoot": "/opt/krew"
+      }
+    }
+  }
+}

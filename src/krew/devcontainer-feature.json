@@ -1,0 +1,40 @@
+{
+  "id": "krew",
+  "version": "1.0.0",
+  "name": "krew (kubectl plugin manager) with plugins",
+  "description": "Installs krew, the kubectl plugin manager, plus a given list of plugins — baked into the image at build time, so container start is instant and needs no network. Installing kubectl itself is left to the official kubectl-helm-minikube feature, which this declares a dependency on. krew is a per-user tool by default (~/.krew), which does not survive a build that runs as root; this installs into a shared KREW_ROOT owned by the remote user instead, and puts it on PATH for every login shell. Each plugin is installed individually because krew aborts the whole batch on the first bad name, which would otherwise let one typo silently cost you every plugin after it.",
+  "documentationURL": "https://github.com/MMunier/devcontainer-features/tree/main/src/krew",
+  "options": {
+    "plugins": {
+      "type": "string",
+      "default": "",
+      "description": "Comma- or space-separated list of krew plugins to install (e.g. 'ctx,ns,tree'). Names must match the krew index; run `kubectl krew search` to browse. Leave empty to install krew alone."
+    },
+    "version": {
+      "type": "string",
+      "proposals": [
+        "latest",
+        "v0.5.0"
+      ],
+      "default": "latest",
+      "description": "krew release to install (e.g. 'v0.5.0'). 'latest' resolves the newest release at image build time."
+    },
+    "krewRoot": {
+      "type": "string",
+      "default": "/usr/local/krew",
+      "description": "Directory krew and its plugins are installed into, exported as KREW_ROOT. A shared path outside any home directory means the install is not lost when a volume is mounted over the remote user's home. Owned by the remote user so plugins can be added later without sudo."
+    },
+    "failOnPluginError": {
+      "type": "boolean",
+      "default": false,
+      "description": "Fail the image build if a plugin cannot be installed. Off by default: a plugin that has been renamed or dropped from the index should not cost you the whole container, so by default the build warns and continues. Turn on if the plugin list is load-bearing and you would rather find out at build time."
+    }
+  },
+  "dependsOn": {
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {}
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/git"
+  ]
+}

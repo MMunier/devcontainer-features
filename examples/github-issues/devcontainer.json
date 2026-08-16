@@ -1,0 +1,37 @@
+{
+  // Claude Code plus the GitHub CLI, so issues and PRs can be read and filed from inside
+  // the container — the GitHub counterpart of the forgejo-issues example.
+  "name": "github-issues",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    // See the claude-code-dev example for why Node must precede claude-code.
+    "ghcr.io/devcontainers/features/node:2": { "version": "lts" },
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {},
+    "ghcr.io/mmunier/devcontainer-features/claude-code-persist-login:1": {},
+
+    // Installing gh is the official feature's job; the auth wiring is ours.
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+
+    // gh reads $GH_TOKEN from the environment natively, so no credential is ever written
+    // to disk and the login survives rebuilds for free. What still needs doing on EVERY
+    // attach is `gh auth setup-git`, which makes `git push` over HTTPS use the same token:
+    // it writes into ~/.gitconfig, and VS Code re-copies that from the host on each
+    // connect, silently dropping the credential helper.
+    "ghcr.io/mmunier/devcontainer-features/github-cli-auth:1": {}
+  },
+
+  "overrideFeatureInstallOrder": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/node",
+    "ghcr.io/anthropics/devcontainer-features/claude-code"
+  ],
+
+  // Where GH_TOKEN comes from. Copy devcontainer.env.example next to this file to
+  // devcontainer.env (GITIGNORED) and fill it in. Unlike "${localEnv:...}", an --env-file
+  // needs nothing exported in the shell that launched VS Code.
+  "runArgs": ["--env-file", ".devcontainer/devcontainer.env"],
+
+  "remoteUser": "vscode"
+}

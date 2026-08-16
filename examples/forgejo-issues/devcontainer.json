@@ -1,0 +1,37 @@
+{
+  // Claude Code plus the Forgejo CLI, so issues can be read and filed from inside the
+  // container — useful when you want the agent (or yourself) to turn work into tracked
+  // tasks without leaving the dev environment.
+  "name": "forgejo-issues",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    // See the claude-code-dev example for why Node must precede claude-code.
+    "ghcr.io/devcontainers/features/node:2": { "version": "lts" },
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {},
+    "ghcr.io/mmunier/devcontainer-features/claude-code-persist-login:1": {},
+
+    // Reads the API token from $FORGEJO_TOKEN at ATTACH time — not build time. A feature
+    // option is fixed when the image is built, so a build-time option would bake the secret
+    // into an image layer, where it stays readable in the image history even after being
+    // rotated. Re-applying it on each attach is also what persists the login across
+    // rebuilds: nothing is stored in a volume, the credential is just re-derived.
+    "ghcr.io/mmunier/devcontainer-features/forgejo-cli:1": {
+      "host": "codeberg.org"
+    }
+  },
+
+  "overrideFeatureInstallOrder": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/node",
+    "ghcr.io/anthropics/devcontainer-features/claude-code"
+  ],
+
+  // Where FORGEJO_TOKEN comes from. Copy devcontainer.env.example next to this file to
+  // devcontainer.env (GITIGNORED) and fill it in. Unlike "${localEnv:...}", an --env-file
+  // needs nothing exported in the shell that launched VS Code.
+  "runArgs": ["--env-file", ".devcontainer/devcontainer.env"],
+
+  "remoteUser": "vscode"
+}

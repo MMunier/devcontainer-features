@@ -1,0 +1,37 @@
+{
+  "id": "forgejo-cli",
+  "version": "1.0.0",
+  "name": "Forgejo CLI (fj) with attach-time token auth",
+  "description": "Installs the Forgejo CLI (`fj`) from an upstream release binary, so issues and pull requests can be read and filed from inside the container. The API token is NOT baked into the image: it is read from a runtime env var — picked up automatically via an --env-file in runArgs, no shell-sourcing required — and written into fj's keys file on every attach, so the login survives rebuilds without a mounted volume. Reasserting on each attach also means the token can be rotated by editing the env file and reconnecting. A missing token is a skip, not a failure: `fj` is still installed and usable against public repos or after a manual `fj auth login`.",
+  "documentationURL": "https://github.com/MMunier/devcontainer-features/tree/main/src/forgejo-cli",
+  "options": {
+    "version": {
+      "type": "string",
+      "proposals": [
+        "latest",
+        "0.6.0"
+      ],
+      "default": "latest",
+      "description": "Forgejo CLI release to install, without a leading 'v' (e.g. '0.6.0'). 'latest' resolves the newest release at image build time."
+    },
+    "tokenEnv": {
+      "type": "string",
+      "default": "FORGEJO_TOKEN",
+      "description": "Name of the environment variable holding the Forgejo API token, read at attach time. Unlike the other values here this IS a secret, which is exactly why it is read from the environment rather than baked into the image."
+    },
+    "host": {
+      "type": "string",
+      "default": "codeberg.org",
+      "description": "Forgejo instance the token authenticates against, as a bare hostname (e.g. codeberg.org, or your self-hosted instance). Used as fj's default host, so commands work outside a checkout of a repo hosted there."
+    },
+    "setDefaultHost": {
+      "type": "boolean",
+      "default": true,
+      "description": "Export FJ_HOST in the shell environment, so `fj` targets the configured host without passing --host. Turn off if you work across several instances and would rather be explicit."
+    }
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils"
+  ],
+  "postAttachCommand": "/usr/local/share/forgejo-cli-attach.sh"
+}

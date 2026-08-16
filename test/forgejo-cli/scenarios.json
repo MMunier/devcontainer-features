@@ -1,0 +1,19 @@
+{
+  "defaults": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "forgejo-cli": {}
+    }
+  },
+  "custom-options": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "forgejo-cli": {
+        "version": "0.6.0",
+        "tokenEnv": "CODEBERG_PAT",
+        "host": "codeberg.org",
+        "setDefaultHost": false
+      }
+    }
+  }
+}

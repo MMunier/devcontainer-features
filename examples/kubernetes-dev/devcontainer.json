@@ -1,0 +1,47 @@
+{
+  // Claude Code plus a Kubernetes toolchain: kubectl, and krew with a handful of the
+  // plugins that make day-to-day cluster work bearable.
+  "name": "kubernetes-dev",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    // See the claude-code-dev example for why Node must precede claude-code.
+    "ghcr.io/devcontainers/features/node:2": { "version": "lts" },
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {},
+    "ghcr.io/mmunier/devcontainer-features/claude-code-persist-login:1": {},
+
+    // Installing kubectl is the official feature's job; krew builds on top of it.
+    // helm/minikube are off here — turn them on if you want them.
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+      "helm": "none",
+      "minikube": "none"
+    },
+
+    // Plugins are baked into the IMAGE at build time, so container start is instant and
+    // needs no network. krew normally installs per-user into ~/.krew, which a build
+    // running as root would put in /root/.krew — invisible to the remote user; the
+    // feature uses a shared KREW_ROOT owned by that user instead.
+    //
+    //   ctx/ns  switch cluster context and namespace
+    //   tree    show ownership hierarchies between resources
+    //   neat    strip the generated noise out of `kubectl get -o yaml`
+    "ghcr.io/mmunier/devcontainer-features/krew:1": {
+      "plugins": "ctx,ns,tree,neat"
+    }
+  },
+
+  "overrideFeatureInstallOrder": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/node",
+    "ghcr.io/anthropics/devcontainer-features/claude-code"
+  ],
+
+  // Your kubeconfig is NOT copied into the image. Mount it read-only at runtime so the
+  // container talks to your real clusters without the credentials living in a layer.
+  "mounts": [
+    "source=${localEnv:HOME}/.kube,target=/home/vscode/.kube,type=bind,consistency=cached,readonly"
+  ],
+
+  "remoteUser": "vscode"
+}

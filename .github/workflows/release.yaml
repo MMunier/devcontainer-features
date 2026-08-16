@@ -14,15 +14,23 @@ name: release
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # This block RESTRICTS the run token rather than expanding it: every scope not
+    # named here is dropped to none. It also means the repo-wide default can stay on
+    # read-only -- an explicit block sets the token's scopes for this job, so there is
+    # no need to hand write access to every workflow in the repo, and no need for a
+    # long-lived PAT (which would be account-scoped and outlive the run).
     permissions:
-      # Required to push the OCI artifacts to ghcr.io.
+      # Required to push the OCI artifacts to ghcr.io. Nothing else is granted.
       packages: write
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      # Actions are pinned to commit SHAs, not tags: a tag is mutable, so whoever
+      # controls it could change what executes in the job holding packages:write.
+      # The trailing comment records which release each SHA was.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Publish features to ghcr.io
-        uses: devcontainers/action@v1
+        uses: devcontainers/action@1082abd5d2bf3a11abccba70eef98df068277772 # v1
         with:
           publish-features: true
           base-path-to-features: ./src

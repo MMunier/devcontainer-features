@@ -30,12 +30,17 @@ check "symlink owned by vscode"    bash -c "[ \"\$(stat -c %U $CLAUDE_JSON)\" = 
 
 # The seeded target must be writable BY THE REMOTE USER without sudo — that is the
 # entire point of seeding at build time instead of chowning in postCreate.
+#
+# The harness already runs this script AS the remote user, so the writes below are made
+# directly. Going through `su vscode` would prompt for a password and fail — su needs root
+# to switch without one, and we are not root here.
+check "tests run as the remote user" bash -c "[ \"\$(id -un)\" = vscode ]"
 check "remote user can write it"   bash -c "
-  su vscode -c 'touch $CLAUDE_DIR/.write-probe && rm $CLAUDE_DIR/.write-probe'"
+  touch $CLAUDE_DIR/.write-probe && rm $CLAUDE_DIR/.write-probe"
 
 # Whatever the symlink resolves to must be writable too, since that is where Claude
 # Code actually writes its config.
 check "remote user can write .claude.json" bash -c "
-  su vscode -c 'printf {} > $CLAUDE_JSON && test -s $CLAUDE_DIR/.claude.json'"
+  printf {} > $CLAUDE_JSON && test -s $CLAUDE_DIR/.claude.json"
 
 reportResults

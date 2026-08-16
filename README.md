@@ -16,6 +16,7 @@ one it works around and why the obvious approach fails.
 | [`authorized-key`](src/authorized-key) | Injects SSH public keys into `authorized_keys` with correct perms. Fills the gap the official `sshd` feature leaves. |
 | [`forgejo-cli`](src/forgejo-cli) | Forgejo CLI (`fj`) for reading and filing issues, authenticated from a runtime token that never enters the image. |
 | [`github-cli-auth`](src/github-cli-auth) | Auth wiring for the official `github-cli` feature: runtime token, plus the `gh auth setup-git` that VS Code's gitconfig copy would otherwise drop. |
+| [`krew`](src/krew) | `kubectl` plugin manager plus a list of plugins, baked into the image, in a shared root a root-run build can actually create. |
 
 ## Usage
 
@@ -40,6 +41,7 @@ Complete, working configurations are in [`examples/`](examples):
 | [`ssh-accessible`](examples/ssh-accessible) | For the bare `devcontainer` CLI, where VS Code's automatic agent forwarding isn't available. |
 | [`forgejo-issues`](examples/forgejo-issues) | Adds the Forgejo CLI, for reading and filing issues from inside the container. |
 | [`github-issues`](examples/github-issues) | The same, for GitHub. |
+| [`kubernetes-dev`](examples/kubernetes-dev) | kubectl plus krew and a few everyday plugins, with the kubeconfig mounted rather than baked in. |
 
 ## One thing that bites everyone
 

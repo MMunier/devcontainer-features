@@ -25,6 +25,7 @@ jobs:
           - authorized-key
           - forgejo-cli
           - github-cli-auth
+          - krew
     steps:
       # Pinned to commit SHAs, not mutable tags. See release.yaml for the reasoning.
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4

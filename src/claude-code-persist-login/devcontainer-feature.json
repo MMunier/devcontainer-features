@@ -1,14 +1,37 @@
 {
   "id": "claude-code-persist-login",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "Persist Claude Code login",
-  "description": "Persists Claude Code's login (~/.claude, incl. the OAuth token in .credentials.json, AND ~/.claude.json which is symlinked into the volume since it lives outside ~/.claude) in a named Docker volume that outlives container stop/start and rebuilds. Pre-seeds the mount target owned by the remote user at build time so Docker's volume seeding gives the fresh volume correct ownership (no runtime chown / sudo needed).",
+  "description": "Persists Claude Code's login (~/.claude, incl. the OAuth token in .credentials.json, AND ~/.claude.json which is symlinked into the volume since it lives outside ~/.claude) in a named Docker volume that outlives container stop/start and rebuilds. Pre-seeds the mount target owned by the remote user at build time so Docker's volume seeding gives the fresh volume correct ownership (no runtime chown / sudo needed). Can also merge a set of default settings into ~/.claude/settings.json — e.g. to turn off Remote Control, which newer Claude Code versions enable at startup by default.",
   "documentationURL": "https://github.com/MMunier/devcontainer-features/tree/main/src/claude-code-persist-login",
+  "options": {
+    "remoteControlAtStartup": {
+      "type": "string",
+      "enum": [
+        "false",
+        "true",
+        "unset"
+      ],
+      "default": "false",
+      "description": "Value for the 'remoteControlAtStartup' key in ~/.claude/settings.json. Newer Claude Code versions turn Remote Control on at startup by default, which exposes the session to being driven from outside the container — off by default here. 'unset' leaves the key alone entirely, so an existing settings.json keeps whatever it has."
+    },
+    "settings": {
+      "type": "string",
+      "default": "",
+      "description": "Extra settings to merge into ~/.claude/settings.json, as a JSON object. The devcontainer CLI strips double quotes from option values, so write it unquoted — '{model:opus,verbose:true}' — which the feature re-quotes into real JSON (true/false/null and numbers stay unquoted). Fully quoted JSON is also accepted when it survives the CLI. Merged one level deep on top of any existing file, so keys not named here are preserved. Applied after remoteControlAtStartup, so it wins if it names the same key."
+    },
+    "overwriteExistingSettings": {
+      "type": "boolean",
+      "default": false,
+      "description": "Replace ~/.claude/settings.json instead of merging into it. Off by default: the file lives on the persisted volume, so a merge keeps settings you changed inside the container across rebuilds. Turn on to make the feature's options the single source of truth on every start."
+    }
+  },
   "mounts": [
     {
       "source": "${devcontainerId}-claude-code-config",
       "target": "/home/vscode/.claude",
       "type": "volume"
     }
-  ]
+  ],
+  "postCreateCommand": "/usr/local/share/claude-code-persist-login/apply-settings.sh || echo 'claude-code-persist-login: settings not applied (see error above); login persistence is unaffected' >&2"
 }

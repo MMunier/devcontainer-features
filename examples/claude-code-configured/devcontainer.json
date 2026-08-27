@@ -1,0 +1,55 @@
+{
+  // claude-code-dev, plus Claude Code's own settings managed from the devcontainer.
+  // Everything here is the persist-login feature; the rest of the container is identical
+  // to the baseline example.
+  "name": "claude-code-configured",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    // See the claude-code-dev example for why Node must precede claude-code.
+    "ghcr.io/devcontainers/features/node:2": { "version": "lts" },
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {},
+
+    "ghcr.io/mmunier/devcontainer-features/claude-code-persist-login:1": {
+      // Remote Control lets the session be driven from outside the container. Newer
+      // Claude Code versions enable it at startup; "false" is the feature's default and
+      // is spelled out here only to make it visible. "unset" leaves the key alone, for
+      // when you would rather manage it by hand inside the container.
+      "remoteControlAtStartup": "false",
+
+      // Anything else you want in ~/.claude/settings.json.
+      //
+      // NOTE THE MISSING QUOTES. The devcontainer CLI strips double quotes out of option
+      // values, so proper JSON here would reach the install script as {model:opus} and
+      // fail to parse. Write it unquoted — the feature re-quotes keys and string values,
+      // leaving true/false/null and numbers as they are. A value it cannot repair fails
+      // the build loudly rather than writing a corrupt settings.json.
+      "settings": "{model:opus,verbose:true,effortLevel:high}",
+
+      // Merging is the default, and is what you usually want: settings.json lives on the
+      // persisted volume, so settings you change INSIDE the container (with /config, say)
+      // survive rebuilds, and only the keys named above are overwritten. Setting this to
+      // true makes the options above the single source of truth and discards in-container
+      // edits on every create.
+      //
+      // Merging is one level deep: naming a nested object like "hooks" or "permissions"
+      // replaces that whole object rather than merging into it.
+      "overwriteExistingSettings": false
+    }
+  },
+
+  "overrideFeatureInstallOrder": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/node",
+    "ghcr.io/anthropics/devcontainer-features/claude-code"
+  ],
+
+  // The settings are applied twice: once at build time (which seeds a FRESH volume) and
+  // again from a postCreateCommand the feature declares itself. The second run is the one
+  // that matters on a rebuild — the volume mounts over ~/.claude, so it hides whatever the
+  // build wrote there. Print the result to confirm which settings actually took effect.
+  "postAttachCommand": "cat ~/.claude/settings.json",
+
+  "remoteUser": "vscode"
+}

@@ -17,6 +17,14 @@
     // Keeps the login across stop/start AND rebuilds. Self-contained: it declares its
     // own named volume and pre-seeds the mount target owned by the remote user at build
     // time, so no `sudo chown` in postCreateCommand is needed.
+    //
+    // With no options it also writes ~/.claude/settings.json with
+    // `remoteControlAtStartup: false`. Newer Claude Code versions turn Remote Control on
+    // at startup, which allows driving the session from outside the container; in a
+    // container you have SSH'd or attached into, that is rarely what you want. Pass
+    // "remoteControlAtStartup": "true" to keep it, or "unset" to leave the key alone.
+    //
+    // See the claude-code-configured example for setting other keys.
     "ghcr.io/mmunier/devcontainer-features/claude-code-persist-login:1": {}
   },
 

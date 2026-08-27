@@ -5,5 +5,23 @@
     "features": {
       "claude-code-persist-login": {}
     }
+  },
+  "custom-settings": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "remoteUser": "vscode",
+    "features": {
+      "claude-code-persist-login": {
+        "settings": "{model:opus,verbose:true}"
+      }
+    }
+  },
+  "settings-unset": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "remoteUser": "vscode",
+    "features": {
+      "claude-code-persist-login": {
+        "remoteControlAtStartup": "unset"
+      }
+    }
   }
 }

@@ -37,6 +37,7 @@ Complete, working configurations are in [`examples/`](examples):
 | Example | For |
 | --- | --- |
 | [`claude-code-dev`](examples/claude-code-dev) | The baseline: Claude Code that stays logged in. Start here. |
+| [`claude-code-configured`](examples/claude-code-configured) | The same, plus Claude Code's own `settings.json` managed from the devcontainer — Remote Control off, model, effort level. |
 | [`signed-commits`](examples/signed-commits) | Adds YubiKey-backed commit signing. |
 | [`ssh-accessible`](examples/ssh-accessible) | For the bare `devcontainer` CLI, where VS Code's automatic agent forwarding isn't available. |
 | [`forgejo-issues`](examples/forgejo-issues) | Adds the Forgejo CLI, for reading and filing issues from inside the container. |

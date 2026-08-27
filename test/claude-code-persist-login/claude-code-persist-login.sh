@@ -43,4 +43,18 @@ check "remote user can write it"   bash -c "
 check "remote user can write .claude.json" bash -c "
   printf {} > $CLAUDE_JSON && test -s $CLAUDE_DIR/.claude.json"
 
+# settings.json carries the feature's defaults. Asserted on the SEED for the same reason as
+# above: the harness attaches no volume, so this is the build-time copy. On a container whose
+# volume already exists this file comes from the postCreateCommand run instead.
+SETTINGS="$CLAUDE_DIR/settings.json"
+check "settings.json exists"       test -f "$SETTINGS"
+check "settings owned by vscode"   bash -c "[ \"\$(stat -c %U $SETTINGS)\" = vscode ]"
+# Remote Control is on by default in newer Claude Code; the feature turns it off.
+check "remote control disabled"    bash -c "
+  grep -q '\"remoteControlAtStartup\": *false' $SETTINGS"
+# grep rather than a JSON parser: the harness's default base image has neither python3
+# nor jq, and this assertion must hold there too.
+check "single json object"         bash -c "
+  [ \"\$(grep -c '^{' $SETTINGS)\" = 1 ] && [ \"\$(grep -c '^}' $SETTINGS)\" = 1 ]"
+
 reportResults
